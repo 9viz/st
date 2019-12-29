@@ -1271,45 +1271,14 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
         colfg.blue = TRUEBLUE(base.fg);
         XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colfg, &truefg);
         fg = &truefg;
-    } else {
-        fg = &dc.col[base.fg];
-    }
-
-    if (IS_TRUECOL(base.bg)) {
-        colbg.alpha = 0xffff;
-        colbg.green = TRUEGREEN(base.bg);
-        colbg.red = TRUERED(base.bg);
-        colbg.blue = TRUEBLUE(base.bg);
-        XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colbg, &truebg);
-        bg = &truebg;
-    } else {
-        bg = &dc.col[base.bg];
     }
 
     if (IS_SET(MODE_REVERSE)) {
-        if (fg == &dc.col[defaultfg]) {
-            fg = &dc.col[defaultbg];
-        } else {
-            colfg.red = ~fg->color.red;
-            colfg.green = ~fg->color.green;
-            colfg.blue = ~fg->color.blue;
-            colfg.alpha = fg->color.alpha;
-            XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colfg,
-                    &revfg);
-            fg = &revfg;
-        }
-
-        if (bg == &dc.col[defaultbg]) {
-            bg = &dc.col[defaultfg];
-        } else {
-            colbg.red = ~bg->color.red;
-            colbg.green = ~bg->color.green;
-            colbg.blue = ~bg->color.blue;
-            colbg.alpha = bg->color.alpha;
-            XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colbg,
-                    &revbg);
-            bg = &revbg;
-        }
+        fg = &dc.col[defaultbg];
+        bg = &dc.col[defaultfg];
+    } else {
+        fg = &dc.col[defaultfg];
+        bg = &dc.col[defaultbg];
     }
 
     if (base.mode & ATTR_REVERSE) {
@@ -1325,15 +1294,13 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
         fg = bg;
 
     /* Intelligent cleaning up of the borders. */
-    if (x == 0) {
+    if (x == 0)
         xclear(0, (y == 0)? 0 : winy, borderpx,
             winy + win.ch +
             ((winy + win.ch >= borderpx + win.th)? win.h : 0));
-    }
-    if (winx + width >= borderpx + win.tw) {
+    if (winx + width >= borderpx + win.tw)
         xclear(winx + width, (y == 0)? 0 : winy, win.w,
             ((winy + win.ch >= borderpx + win.th)? win.h : (winy + win.ch)));
-    }
     if (y == 0)
         xclear(winx, 0, winx + width, borderpx);
     if (winy + win.ch >= borderpx + win.th)
@@ -1353,15 +1320,13 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
     XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
 
     /* Render underline and strikethrough. */
-    if (base.mode & ATTR_UNDERLINE) {
+    if (base.mode & ATTR_UNDERLINE)
         XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
                 width, 1);
-    }
 
-    if (base.mode & ATTR_STRUCK) {
+    if (base.mode & ATTR_STRUCK)
         XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent / 3,
                 width, 1);
-    }
 
     /* Reset clip to none. */
     XftDrawSetClip(xw.draw, 0);
