@@ -132,7 +132,7 @@ typedef struct {
 typedef struct {
     Color *col;
     size_t collen;
-    Font font, bfont, ifont, ibfont;
+    Font font;
     GC gc;
 } DC;
 
@@ -218,9 +218,6 @@ static TermWindow win;
 /* Font Ring Cache */
 enum {
     FRC_NORMAL,
-    FRC_ITALIC,
-    FRC_BOLD,
-    FRC_ITALICBOLD
 };
 
 typedef struct {
@@ -967,20 +964,6 @@ xloadfonts(char *fontstr, double fontsize)
     win.ch = ceilf(dc.font.height * chscale);
 
     FcPatternDel(pattern, FC_SLANT);
-    FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
-    if (xloadfont(&dc.ifont, pattern))
-        die("can't open font %s\n", fontstr);
-
-    FcPatternDel(pattern, FC_WEIGHT);
-    FcPatternAddInteger(pattern, FC_WEIGHT, FC_WEIGHT_BOLD);
-    if (xloadfont(&dc.ibfont, pattern))
-        die("can't open font %s\n", fontstr);
-
-    FcPatternDel(pattern, FC_SLANT);
-    FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ROMAN);
-    if (xloadfont(&dc.bfont, pattern))
-        die("can't open font %s\n", fontstr);
-
     FcPatternDestroy(pattern);
 }
 
@@ -1001,9 +984,6 @@ xunloadfonts(void)
         XftFontClose(xw.dpy, frc[--frclen].font);
 
     xunloadfont(&dc.font);
-    xunloadfont(&dc.bfont);
-    xunloadfont(&dc.ifont);
-    xunloadfont(&dc.ibfont);
 }
 
 void
