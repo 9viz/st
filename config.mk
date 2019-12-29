@@ -14,16 +14,16 @@ PKG_CONFIG = pkg-config
 
 # includes and libs
 INCS = -I$(X11INC) \
-       `$(PKG_CONFIG) --cflags fontconfig` \
-       `$(PKG_CONFIG) --cflags freetype2`
+	   `$(PKG_CONFIG) --cflags fontconfig` \
+	   `$(PKG_CONFIG) --cflags freetype2`
 LIBS = -L$(X11LIB) -lm -lrt -lX11 -lutil -lXft \
-       `$(PKG_CONFIG) --libs fontconfig` \
-       `$(PKG_CONFIG) --libs freetype2`
+	   `$(PKG_CONFIG) --libs fontconfig` \
+	   `$(PKG_CONFIG) --libs freetype2`
 
 # flags
-STCPPFLAGS = -DVERSION=\"$(VERSION)\" -D_XOPEN_SOURCE=600
-STCFLAGS = $(INCS) $(STCPPFLAGS) $(CPPFLAGS) $(CFLAGS)
-STLDFLAGS = $(LIBS) $(LDFLAGS)
+CPPFLAGS += -DVERSION=\"$(VERSION)\" -D_XOPEN_SOURCE=600
+CFLAGS += $(INCS) $(CPPFLAGS)
+LDFLAGS += $(LIBS)
 
 # OpenBSD:
 #CPPFLAGS = -DVERSION=\"$(VERSION)\" -D_XOPEN_SOURCE=600 -D_BSD_SOURCE
@@ -32,4 +32,4 @@ STLDFLAGS = $(LIBS) $(LDFLAGS)
 #       `pkg-config --libs freetype2`
 
 # compiler and linker
-# CC = c99
+CC = cc
