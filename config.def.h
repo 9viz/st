@@ -119,16 +119,6 @@ static const char *colorname[] = {
 unsigned int defaultfg = 7;
 unsigned int defaultbg = 0;
 static unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
-
-/*
- * Default shape of cursor
- * 2: Block ("█")
- * 4: Underline ("_")
- * 6: Bar ("|")
- * 7: Snowman ("☃")
- */
-static unsigned int cursorshape = 2;
 
 /*
  * Default columns and rows numbers
