@@ -1415,16 +1415,9 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
      */
     g.mode &= ATTR_UNDERLINE|ATTR_STRUCK|ATTR_WIDE;
 
-    if (IS_SET(MODE_REVERSE)) {
-        g.mode |= ATTR_REVERSE;
-        g.bg = defaultfg;
-        g.fg = defaultcs;
-        drawcol = dc.col[defaultcs];
-    } else {
-        g.fg = defaultbg;
-        g.bg = defaultcs;
-        drawcol = dc.col[g.bg];
-    }
+    g.fg = defaultbg;
+    g.bg = defaultcs;
+    drawcol = dc.col[g.bg];
 
     /* draw the new one */
     if (IS_SET(MODE_FOCUSED))
