@@ -1419,7 +1419,7 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
         g.mode |= ATTR_REVERSE;
         g.bg = defaultfg;
         g.fg = defaultcs;
-        drawcol = dc.col[defaultrcs];
+        drawcol = dc.col[defaultcs];
     } else {
         g.fg = defaultbg;
         g.bg = defaultcs;
@@ -1548,16 +1548,6 @@ xsetmode(int set, unsigned int flags)
     MODBIT(win.mode, set, flags);
     if ((win.mode & MODE_REVERSE) != (mode & MODE_REVERSE))
         redraw();
-}
-
-int
-xsetcursor(int cursor)
-{
-    DEFAULT(cursor, 1);
-    if (!BETWEEN(cursor, 0, 6))
-        return 1;
-    win.cursor = cursor;
-    return 0;
 }
 
 void
@@ -1847,7 +1837,6 @@ main(int argc, char *argv[])
 {
     xw.l = xw.t = 0;
     xw.isfixed = False;
-    win.cursor = cursorshape;
 
     ARGBEGIN {
     case 'a':

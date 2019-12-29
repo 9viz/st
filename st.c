@@ -1772,10 +1772,6 @@ csihandle(void)
         break;
     case ' ':
         switch (csiescseq.mode[1]) {
-        case 'q': /* DECSCUSR -- Set Cursor Style */
-            if (xsetcursor(csiescseq.arg[0]))
-                goto unknown;
-            break;
         default:
             goto unknown;
         }
