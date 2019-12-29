@@ -1770,12 +1770,6 @@ csihandle(void)
     case 'u': /* DECRC -- Restore cursor position (ANSI.SYS) */
         tcursor(CURSOR_LOAD);
         break;
-    case ' ':
-        switch (csiescseq.mode[1]) {
-        default:
-            goto unknown;
-        }
-        break;
     }
 }
 
