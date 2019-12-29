@@ -131,7 +131,6 @@ typedef struct {
 /* Drawing Context */
 typedef struct {
     Color *col;
-    size_t collen;
     Font font;
     GC gc;
 } DC;
@@ -729,7 +728,7 @@ int
 xloadcolor(int i, const char *name, Color *ncolor)
 {
     if (!name)
-        name = colorname[(i > 15) ? 7 : i];
+        name = fgbgcols[(i > 15) ? 7 : i];
 
     return XftColorAllocName(xw.dpy, xw.vis, xw.cmap, name, ncolor);
 }
@@ -741,21 +740,14 @@ xloadcols(void)
     static int loaded;
     Color *cp;
 
-    if (loaded) {
-        for (cp = dc.col; cp < &dc.col[dc.collen]; ++cp)
+    if (loaded)
+        for (cp = dc.col; cp < &dc.col[2]; ++cp)
             XftColorFree(xw.dpy, xw.vis, xw.cmap, cp);
-    } else {
-        dc.collen = MAX(LEN(colorname), 256);
-        dc.col = xmalloc(dc.collen * sizeof(Color));
-    }
+    else
+        dc.col = xmalloc(2 * sizeof(Color));
 
-    for (i = 0; i < dc.collen; i++)
-        if (!xloadcolor(i, NULL, &dc.col[i])) {
-            if (colorname[i])
-                die("could not allocate color '%s'\n", colorname[i]);
-            else
-                die("could not allocate color %d\n", i);
-        }
+    xloadcolor(0, NULL, &dc.col[0]);
+    xloadcolor(1, NULL, &dc.col[1]);
     loaded = 1;
 }
 
@@ -764,7 +756,7 @@ xsetcolorname(int x, const char *name)
 {
     Color ncolor;
 
-    if (!BETWEEN(x, 0, dc.collen))
+    if (!BETWEEN(x, 0, 2))
         return 1;
 
     if (!xloadcolor(x, name, &ncolor))
@@ -783,7 +775,7 @@ void
 xclear(int x1, int y1, int x2, int y2)
 {
     XftDrawRect(xw.draw,
-            &dc.col[IS_SET(MODE_REVERSE)? defaultfg : defaultbg],
+            &dc.col[IS_SET(MODE_REVERSE)? 1 : 0],
             x1, y1, x2-x1, y2-y1);
 }
 
@@ -1057,8 +1049,8 @@ xinit(int cols, int rows)
         xw.t += DisplayHeight(xw.dpy, xw.scr) - win.h - 2;
 
     /* Events */
-    xw.attrs.background_pixel = dc.col[defaultbg].pixel;
-    xw.attrs.border_pixel = dc.col[defaultbg].pixel;
+    xw.attrs.background_pixel = dc.col[0].pixel;
+    xw.attrs.border_pixel = dc.col[0].pixel;
     xw.attrs.bit_gravity = NorthWestGravity;
     xw.attrs.event_mask = FocusChangeMask | KeyPressMask | KeyReleaseMask
         | ExposureMask | VisibilityChangeMask | StructureNotifyMask
@@ -1078,7 +1070,7 @@ xinit(int cols, int rows)
             &gcvalues);
     xw.buf = XCreatePixmap(xw.dpy, xw.win, win.w, win.h,
             DefaultDepth(xw.dpy, xw.scr));
-    XSetForeground(xw.dpy, dc.gc, dc.col[defaultbg].pixel);
+    XSetForeground(xw.dpy, dc.gc, dc.col[0].pixel);
     XFillRectangle(xw.dpy, xw.buf, dc.gc, 0, 0, win.w, win.h);
 
     /* font spec buffer */
@@ -1094,17 +1086,8 @@ xinit(int cols, int rows)
     cursor = XCreateFontCursor(xw.dpy, mouseshape);
     XDefineCursor(xw.dpy, xw.win, cursor);
 
-    if (XParseColor(xw.dpy, xw.cmap, colorname[mousefg], &xmousefg) == 0) {
-        xmousefg.red   = 0xffff;
-        xmousefg.green = 0xffff;
-        xmousefg.blue  = 0xffff;
-    }
-
-    if (XParseColor(xw.dpy, xw.cmap, colorname[mousebg], &xmousebg) == 0) {
-        xmousebg.red   = 0x0000;
-        xmousebg.green = 0x0000;
-        xmousebg.blue  = 0x0000;
-    }
+    XParseColor(xw.dpy, xw.cmap, fgbgcols[1], &xmousefg);
+    XParseColor(xw.dpy, xw.cmap, fgbgcols[0], &xmousebg);
 
     XRecolorCursor(xw.dpy, cursor, &xmousefg, &xmousebg);
 
@@ -1273,12 +1256,12 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
         fg = &truefg;
     }
 
+    fg = &dc.col[1];
+    bg = &dc.col[0];
+
     if (IS_SET(MODE_REVERSE)) {
-        fg = &dc.col[defaultbg];
-        bg = &dc.col[defaultfg];
-    } else {
-        fg = &dc.col[defaultfg];
-        bg = &dc.col[defaultbg];
+        fg = &dc.col[0];
+        bg = &dc.col[1];
     }
 
     if (base.mode & ATTR_REVERSE) {
@@ -1360,9 +1343,7 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
      */
     g.mode &= ATTR_UNDERLINE|ATTR_STRUCK|ATTR_WIDE;
 
-    g.fg = defaultbg;
-    g.bg = defaultcs;
-    drawcol = dc.col[g.bg];
+    drawcol = dc.col[1];
 
     /* draw the new one */
     if (IS_SET(MODE_FOCUSED))
@@ -1439,7 +1420,7 @@ xfinishdraw(void)
             win.h, 0, 0);
     XSetForeground(xw.dpy, dc.gc,
             dc.col[IS_SET(MODE_REVERSE)?
-                defaultfg : defaultbg].pixel);
+                0 : 1].pixel);
 }
 
 void
