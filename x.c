@@ -1183,16 +1183,6 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
             font = &dc.font;
             frcflags = FRC_NORMAL;
             runewidth = win.cw * ((mode & ATTR_WIDE) ? 2.0f : 1.0f);
-            if ((mode & ATTR_ITALIC) && (mode & ATTR_BOLD)) {
-                font = &dc.ibfont;
-                frcflags = FRC_ITALICBOLD;
-            } else if (mode & ATTR_ITALIC) {
-                font = &dc.ifont;
-                frcflags = FRC_ITALIC;
-            } else if (mode & ATTR_BOLD) {
-                font = &dc.bfont;
-                frcflags = FRC_BOLD;
-            }
             yp = winy + font->ascent;
         }
 
@@ -1294,15 +1284,6 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
     XRenderColor colfg, colbg;
     XRectangle r;
 
-    /* Fallback on color display for attributes not supported by the font */
-    if (base.mode & ATTR_ITALIC && base.mode & ATTR_BOLD) {
-        if (dc.ibfont.badslant || dc.ibfont.badweight)
-            base.fg = defaultattr;
-    } else if ((base.mode & ATTR_ITALIC && dc.ifont.badslant) ||
-        (base.mode & ATTR_BOLD && dc.bfont.badweight)) {
-        base.fg = defaultattr;
-    }
-
     if (IS_TRUECOL(base.fg)) {
         colfg.alpha = 0xffff;
         colfg.red = TRUERED(base.fg);
@@ -1324,10 +1305,6 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
     } else {
         bg = &dc.col[base.bg];
     }
-
-    /* Change basic system colors [0-7] to bright system colors [8-15] */
-    if ((base.mode & ATTR_BOLD_FAINT) == ATTR_BOLD && BETWEEN(base.fg, 0, 7))
-        fg = &dc.col[base.fg + 8];
 
     if (IS_SET(MODE_REVERSE)) {
         if (fg == &dc.col[defaultfg]) {
@@ -1353,15 +1330,6 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
                     &revbg);
             bg = &revbg;
         }
-    }
-
-    if ((base.mode & ATTR_BOLD_FAINT) == ATTR_FAINT) {
-        colfg.red = fg->color.red / 2;
-        colfg.green = fg->color.green / 2;
-        colfg.blue = fg->color.blue / 2;
-        colfg.alpha = fg->color.alpha;
-        XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colfg, &revfg);
-        fg = &revfg;
     }
 
     if (base.mode & ATTR_REVERSE) {
@@ -1445,7 +1413,7 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
     /*
      * Select the right color for the right mode.
      */
-    g.mode &= ATTR_BOLD|ATTR_ITALIC|ATTR_UNDERLINE|ATTR_STRUCK|ATTR_WIDE;
+    g.mode &= ATTR_UNDERLINE|ATTR_STRUCK|ATTR_WIDE;
 
     if (IS_SET(MODE_REVERSE)) {
         g.mode |= ATTR_REVERSE;
