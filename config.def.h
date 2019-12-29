@@ -96,17 +96,6 @@ static unsigned int cols = 80;
 static unsigned int rows = 24;
 
 /*
- * Default shape of the mouse cursor
- */
-static unsigned int mouseshape = XC_xterm;
-
-/*
- * Color used to display font attributes when fontconfig selected a font which
- * doesn't match the ones requested.
- */
-static unsigned int defaultattr = 11;
-
-/*
  * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
  * Note that if you want to use ShiftMask with selmasks, set this to an other
  * modifier, set to 0 to not use it.

@@ -1083,7 +1083,7 @@ xinit(int cols, int rows)
     ximopen(xw.dpy);
 
     /* white cursor, black outline */
-    cursor = XCreateFontCursor(xw.dpy, mouseshape);
+    cursor = XCreateFontCursor(xw.dpy, XC_xterm);
     XDefineCursor(xw.dpy, xw.win, cursor);
 
     XParseColor(xw.dpy, xw.cmap, fgbgcols[1], &xmousefg);
