@@ -80,9 +80,9 @@ char *termname = "st";
  *
  *  stty tabs
  */
-unsigned int tabspaces = 8;
+unsigned int tabspaces = 4;
 
-/* Terminal colors (16 first used in escape sequence) */
+/* Terminal colors */
 static const char *fgbgcols[2] = {
     "black",
     "gray90",
