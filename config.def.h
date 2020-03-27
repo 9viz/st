@@ -52,9 +52,9 @@ static unsigned int actionfps = 30;
 static unsigned int blinktimeout = 800;
 
 /*
- * thickness of underline and bar cursors
+ * thickness of underline cursor
  */
-static unsigned int cursorthickness = 2;
+static unsigned int cursorthickness = 3;
 
 /*
  * bell volume. It must be a value between -100 and 100. Use 0 for disabling
@@ -84,8 +84,8 @@ unsigned int tabspaces = 4;
 
 /* Terminal colors */
 static const char *fgbgcols[2] = {
-    "black",
-    "gray90",
+    "e7e7d4",
+    "1c1e1d",
 };
 
 /*
