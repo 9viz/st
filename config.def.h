@@ -63,7 +63,7 @@ static unsigned int cursorthickness = 3;
 static int bellvolume = 0;
 
 /* default TERM value */
-char *termname = "st-256color";
+char *termname = "st";
 
 /*
  * spaces per tab
@@ -83,9 +83,10 @@ char *termname = "st-256color";
 unsigned int tabspaces = 4;
 
 /* Terminal colors */
-static const char *fgbgcols[2] = {
+static const char *fgbgcols[3] = {
     "#e7e7d4",
     "#1c1e1d",
+	"#a9a9a1", /* accent */
 };
 
 /*

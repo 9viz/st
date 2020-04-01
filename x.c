@@ -728,7 +728,7 @@ int
 xloadcolor(int i, const char *name, Color *ncolor)
 {
     if (!name)
-        name = fgbgcols[(i > 15) ? 7 : i];
+        name = fgbgcols[i];
 
     return XftColorAllocName(xw.dpy, xw.vis, xw.cmap, name, ncolor);
 }
@@ -741,13 +741,13 @@ xloadcols(void)
     Color *cp;
 
     if (loaded)
-        for (cp = dc.col; cp < &dc.col[2]; ++cp)
+        for (cp = dc.col; cp < &dc.col[3]; ++cp)
             XftColorFree(xw.dpy, xw.vis, xw.cmap, cp);
     else
-        dc.col = xmalloc(2 * sizeof(Color));
+        dc.col = xmalloc(3 * sizeof(Color));
 
-    xloadcolor(0, NULL, &dc.col[0]);
-    xloadcolor(1, NULL, &dc.col[1]);
+	for (i = 0; i <= 2; i++)
+	    xloadcolor(i, NULL, &dc.col[i]);
     loaded = 1;
 }
 
@@ -1255,7 +1255,7 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
         XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colfg, &truefg);
         fg = &truefg;
     } else 
-	    fg = &dc.col[1];
+	    fg = &dc.col[base.fg == 16 ? 2 : 1];
 
 	if (IS_TRUECOL(base.bg)) {
         colfg.alpha = 0xffff;
@@ -1265,16 +1265,16 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
         XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colbg, &truebg);
         bg = &truebg;
 	} else
-	    bg = &dc.col[0];
+	    bg = &dc.col[base.bg == 16 ? 2 : 0];
 
     if (IS_SET(MODE_REVERSE)) {
-        fg = &dc.col[0];
-        bg = &dc.col[1];
+        fg = &dc.col[base.bg == 16 ? 2 : 0];
+        bg = &dc.col[base.fg == 16 ? 2 : 1];
     }
 
     if (base.mode & ATTR_REVERSE) {
-        fg = &dc.col[0];
-        bg = &dc.col[1];
+        fg = &dc.col[base.bg == 16 ? 2 : 0];
+        bg = &dc.col[base.fg == 16 ? 2 : 1];
     }
 
     if (base.mode & ATTR_BLINK && win.mode & MODE_BLINK)
