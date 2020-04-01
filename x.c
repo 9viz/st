@@ -1243,7 +1243,7 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
     int charlen = len * ((base.mode & ATTR_WIDE) ? 2 : 1);
     int winx = borderpx + x * win.cw, winy = borderpx + y * win.ch,
         width = charlen * win.cw;
-    Color *fg, *bg, *temp, revfg, revbg, truefg, truebg;
+    Color *fg, *bg, truefg, truebg;
     XRenderColor colfg, colbg;
     XRectangle r;
 
@@ -1254,10 +1254,18 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
         colfg.blue = TRUEBLUE(base.fg);
         XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colfg, &truefg);
         fg = &truefg;
-    }
+    } else 
+	    fg = &dc.col[1];
 
-    fg = &dc.col[1];
-    bg = &dc.col[0];
+	if (IS_TRUECOL(base.bg)) {
+        colfg.alpha = 0xffff;
+        colfg.red = TRUERED(base.bg);
+        colfg.green = TRUEGREEN(base.bg);
+        colfg.blue = TRUEBLUE(base.bg);
+        XftColorAllocValue(xw.dpy, xw.vis, xw.cmap, &colbg, &truebg);
+        bg = &truebg;
+	} else
+	    bg = &dc.col[0];
 
     if (IS_SET(MODE_REVERSE)) {
         fg = &dc.col[0];
@@ -1265,9 +1273,8 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
     }
 
     if (base.mode & ATTR_REVERSE) {
-        temp = fg;
-        fg = bg;
-        bg = temp;
+        fg = &dc.col[0];
+        bg = &dc.col[1];
     }
 
     if (base.mode & ATTR_BLINK && win.mode & MODE_BLINK)
