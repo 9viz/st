@@ -86,7 +86,7 @@ unsigned int tabspaces = 4;
 static const char *fgbgcols[3] = {
     "#e7e7d4",
     "#1c1e1d",
-	"#a9a9a1", /* accent */
+	"#eaed8d", /* accent */
 };
 
 /*
