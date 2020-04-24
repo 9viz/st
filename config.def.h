@@ -85,7 +85,7 @@ unsigned int tabspaces = 4;
 /* Terminal colors */
 static const char *fgbgcols[3] = {
     "#ffffea",
-    "#000000",
+    "#1c1c1d",
 	"#eaed8d", /* accent */
 };
 
